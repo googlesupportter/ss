@@ -9,6 +9,7 @@ import com.vm.shadowsocks.utils.L;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
+import java.net.URLDecoder;
 
 /**
  * @Copyright © 2018 sanbo Inc. All rights reserved.
@@ -27,40 +28,48 @@ public class ShadowsocksConfig extends Config {
     //default ss addr:   ss://String(Base64(byte(ASCII)))
     public static ShadowsocksConfig parse(String proxyInfo) throws Exception {
         ShadowsocksConfig config = new ShadowsocksConfig();
-        Uri uri = Uri.parse(proxyInfo);
-        if (uri.getPort() == -1) {
-            String host = uri.getHost();
-            proxyInfo = "ss://" + new String(Base64.decode(host.getBytes("ASCII"), Base64.DEFAULT));
-            uri = Uri.parse(proxyInfo);
-        }
-        String userInfoString = uri.getUserInfo();
-        if (!TextUtils.isEmpty(userInfoString) && !userInfoString.contains(":")) {
-            try {
-                userInfoString = new String(Base64.decode(userInfoString.getBytes("ASCII"), Base64.DEFAULT));
-            } catch (Throwable e) {
+        try {
+            Uri uri = Uri.parse(proxyInfo);
+            if (uri.getPort() == -1) {
+                String host = uri.getHost();
+                String path =
+                        URLDecoder.decode(
+                                new String(Base64.decode(host.getBytes("ASCII"), Base64.DEFAULT)), "UTF-8");
+                proxyInfo = "ss://" + path;
+                uri = Uri.parse(proxyInfo);
+            }
+            String userInfoString = uri.getUserInfo();
+            if (!TextUtils.isEmpty(userInfoString) && !userInfoString.contains(":")) {
                 try {
-                    userInfoString = new String(Base64.decode(userInfoString.getBytes("UTF-8"), Base64.DEFAULT));
-                } catch (Throwable ex) {
+                    userInfoString = new String(Base64.decode(userInfoString.getBytes("ASCII"), Base64.DEFAULT));
+                } catch (Throwable e) {
+                    try {
+                        userInfoString = new String(Base64.decode(userInfoString.getBytes("UTF-8"), Base64.DEFAULT));
+                    } catch (Throwable ex) {
+                    }
                 }
             }
-        }
-        //ss://加密方式:密码@域名:端口
-        L.i("ShadowsocksConfig uri:" + uri.toString());
-        //加密方式:密码
-        L.i("ShadowsocksConfig userInfoString:" + userInfoString);
-        if (!TextUtils.isEmpty(userInfoString)) {
-            String[] userStrings = userInfoString.split(":");
-            config.EncryptMethod = userStrings[0];
-            if (userStrings.length >= 2) {
-                config.Password = userStrings[1];
+            //ss://加密方式:密码@域名:端口
+            L.i("ShadowsocksConfig uri:" + uri.toString());
+            //加密方式:密码
+            L.i("ShadowsocksConfig userInfoString:" + userInfoString);
+            if (!TextUtils.isEmpty(userInfoString)) {
+                String[] userStrings = userInfoString.split(":");
+                config.EncryptMethod = userStrings[0];
+                if (userStrings.length >= 2) {
+                    config.Password = userStrings[1];
+                }
             }
+            if (!CryptFactory.isCipherExisted(config.EncryptMethod)) {
+                throw new Exception(String.format("Method: %s does not support", config.EncryptMethod));
+            }
+            //ss://加密方式:密码@域名:端口
+            L.i("ShadowsocksConfig InetSocketAddress uri:" + uri.toString());
+            config.ServerAddress = new InetSocketAddress(uri.getHost(), uri.getPort());// 域名,端口
+
+        } catch (Throwable igone) {
+            L.e(igone);
         }
-        if (!CryptFactory.isCipherExisted(config.EncryptMethod)) {
-            throw new Exception(String.format("Method: %s does not support", config.EncryptMethod));
-        }
-        //ss://加密方式:密码@域名:端口
-        L.i("ShadowsocksConfig InetSocketAddress uri:" + uri.toString());
-        config.ServerAddress = new InetSocketAddress(uri.getHost(), uri.getPort());// 域名,端口
         return config;
     }
 

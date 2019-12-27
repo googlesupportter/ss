@@ -124,8 +124,13 @@ public class L {
      * @param format            是否需要格式化.
      * @param defaultTag        android logcat的tag一个意义,不设置默认的tag为"sanbo"
      */
-    public static void init(boolean showLog, boolean shellControl, boolean needWarpper, boolean needCallStackInfo,
-                            boolean format, String defaultTag) {
+    public static void init(
+            boolean showLog,
+            boolean shellControl,
+            boolean needWarpper,
+            boolean needCallStackInfo,
+            boolean format,
+            String defaultTag) {
         isShowLog = showLog;
         isShellControl = shellControl;
         isNeedWrapper = needWarpper;
