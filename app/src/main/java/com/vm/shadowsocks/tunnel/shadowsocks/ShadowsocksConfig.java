@@ -1,11 +1,13 @@
 package com.vm.shadowsocks.tunnel.shadowsocks;
 
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Base64;
 
 import com.vm.shadowsocks.tunnel.Config;
 import com.vm.shadowsocks.utils.L;
 
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 
 /**
@@ -31,13 +33,22 @@ public class ShadowsocksConfig extends Config {
             proxyInfo = "ss://" + new String(Base64.decode(host.getBytes("ASCII"), Base64.DEFAULT));
             uri = Uri.parse(proxyInfo);
         }
+        String userInfoString = uri.getUserInfo();
+        if (!TextUtils.isEmpty(userInfoString) && !userInfoString.contains(":")) {
+            try {
+                userInfoString = new String(Base64.decode(userInfoString.getBytes("ASCII"), Base64.DEFAULT));
+            } catch (Throwable e) {
+                try {
+                    userInfoString = new String(Base64.decode(userInfoString.getBytes("UTF-8"), Base64.DEFAULT));
+                } catch (Throwable ex) {
+                }
+            }
+        }
         //ss://加密方式:密码@域名:端口
         L.i("ShadowsocksConfig uri:" + uri.toString());
-
-        String userInfoString = uri.getUserInfo();
         //加密方式:密码
         L.i("ShadowsocksConfig userInfoString:" + userInfoString);
-        if (userInfoString != null) {
+        if (!TextUtils.isEmpty(userInfoString)) {
             String[] userStrings = userInfoString.split(":");
             config.EncryptMethod = userStrings[0];
             if (userStrings.length >= 2) {
@@ -55,8 +66,9 @@ public class ShadowsocksConfig extends Config {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null)
+        if (o == null) {
             return false;
+        }
         return this.toString().equals(o.toString());
     }
 

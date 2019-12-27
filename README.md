@@ -16,6 +16,7 @@ shadowsocks settings format
 ```
 ss://method:password@host:port
 ss://base64encode(method:password@host:port)
+ss://base64encode(method:password)@host:port
 ```
 
 And also it inherited the support of http proxy from Smartproxy , Set the url as stardand http(s) proxy format when use it. 
