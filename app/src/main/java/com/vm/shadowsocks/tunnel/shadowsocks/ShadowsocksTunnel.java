@@ -52,7 +52,7 @@ public class ShadowsocksTunnel extends Tunnel {
     }
 
     @Override
-    protected void beforeSend(ByteBuffer buffer) throws Exception {
+    protected void beforeSend(ByteBuffer buffer) {
 
         byte[] bytes = new byte[buffer.limit()];
         buffer.get(bytes);
@@ -65,7 +65,7 @@ public class ShadowsocksTunnel extends Tunnel {
     }
 
     @Override
-    protected void afterReceived(ByteBuffer buffer) throws Exception {
+    protected void afterReceived(ByteBuffer buffer) {
         byte[] bytes = new byte[buffer.limit()];
         buffer.get(bytes);
         byte[] newbytes = m_Encryptor.decrypt(bytes);

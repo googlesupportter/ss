@@ -16,6 +16,26 @@ public abstract class Tunnel {
 
     final static ByteBuffer GL_BUFFER = ByteBuffer.allocate(20000);
     public static long SessionCount;
+    protected InetSocketAddress m_DestAddress;
+    private SocketChannel m_InnerChannel;
+    private ByteBuffer m_SendRemainBuffer;
+    private Selector m_Selector;
+    private Tunnel m_BrotherTunnel;
+    private boolean m_Disposed;
+    private InetSocketAddress m_ServerEP;
+    public Tunnel(SocketChannel innerChannel, Selector selector) {
+        this.m_InnerChannel = innerChannel;
+        this.m_Selector = selector;
+        SessionCount++;
+    }
+    public Tunnel(InetSocketAddress serverAddress, Selector selector) throws IOException {
+        SocketChannel innerChannel = SocketChannel.open();
+        innerChannel.configureBlocking(false);
+        this.m_InnerChannel = innerChannel;
+        this.m_Selector = selector;
+        this.m_ServerEP = serverAddress;
+        SessionCount++;
+    }
 
     protected abstract void onConnected(ByteBuffer buffer) throws Exception;
 
@@ -26,29 +46,6 @@ public abstract class Tunnel {
     protected abstract void afterReceived(ByteBuffer buffer) throws Exception;
 
     protected abstract void onDispose();
-
-    private SocketChannel m_InnerChannel;
-    private ByteBuffer m_SendRemainBuffer;
-    private Selector m_Selector;
-    private Tunnel m_BrotherTunnel;
-    private boolean m_Disposed;
-    private InetSocketAddress m_ServerEP;
-    protected InetSocketAddress m_DestAddress;
-
-    public Tunnel(SocketChannel innerChannel, Selector selector) {
-        this.m_InnerChannel = innerChannel;
-        this.m_Selector = selector;
-        SessionCount++;
-    }
-
-    public Tunnel(InetSocketAddress serverAddress, Selector selector) throws IOException {
-        SocketChannel innerChannel = SocketChannel.open();
-        innerChannel.configureBlocking(false);
-        this.m_InnerChannel = innerChannel;
-        this.m_Selector = selector;
-        this.m_ServerEP = serverAddress;
-        SessionCount++;
-    }
 
     public void setBrotherTunnel(Tunnel brotherTunnel) {
         m_BrotherTunnel = brotherTunnel;

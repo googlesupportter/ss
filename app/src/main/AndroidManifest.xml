@@ -1,20 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.vm.shadowsocks">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.vm.shadowsocks"
+    android:versionCode="1"
+    android:versionName="1.2">
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="23" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission
+        android:name="android.permission.INTERACT_ACROSS_USERS"
+        tools:ignore="ProtectedPermissions" />
+
+    <permission
+        android:name="android.permission.INTERACT_ACROSS_USERS_FULL"
+        android:protectionLevel="signature" />
+
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@drawable/shadowsocks"
         android:label="@string/app_name"
+        android:persistent="true"
         android:theme="@style/AppTheme"
-        android:persistent="true">
-
+        android:usesCleartextTraffic="true">
         <activity
-            android:name="com.vm.shadowsocks.ui.MainActivity"
+            android:name=".ui.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask">
             <intent-filter>
@@ -22,19 +41,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name="com.vm.shadowsocks.ui.AppManager"
-            android:label="@string/proxied_apps"
+            android:name=".ui.AppManager"
             android:excludeFromRecents="true"
-            android:launchMode="singleTask"/>
+            android:label="@string/proxied_apps"
+            android:launchMode="singleTask" />
 
         <service
-            android:name="com.vm.shadowsocks.core.LocalVpnService"
+            android:name=".core.LocalVpnService"
             android:permission="android.permission.BIND_VPN_SERVICE">
             <intent-filter>
                 <action android:name="android.net.VpnService" />
             </intent-filter>
         </service>
+
+        <activity
+            android:name=".ui.ScanActivity"
+            android:screenOrientation="portrait"
+            android:stateNotNeeded="true"
+            android:theme="@style/zxing_CaptureTheme"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="ratio_float" />
     </application>
+
 </manifest>

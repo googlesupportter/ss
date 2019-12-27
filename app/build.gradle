@@ -1,44 +1,70 @@
 apply plugin: 'com.android.application'
 
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
-    }
-}
-
 android {
     compileSdkVersion 26
-    buildToolsVersion '26.0.1'
+    buildToolsVersion '26.0.2'
     useLibrary 'org.apache.http.legacy'
 
-    defaultConfig {
-        applicationId "com.vm.shadowsocks"
-        minSdkVersion 15
-        targetSdkVersion 26
-        versionCode 1
-        versionName "1.2"
-    }
+//    defaultConfig {
+//        applicationId "com.vm.shadowsocks"
+//        minSdkVersion 15
+//        targetSdkVersion 26
+//        versionCode 1
+//        versionName "1.2"
+//    }
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    dexOptions {
+        // 声明是否预 dex 库依赖项以加快您的增量构建速度。由于此功能可能减慢您的干净构建的速度，您可能需要为持续性集成服务器停用此功能。
+        preDexLibraries false
+        // 设置运行 dex-in-process 时要使用的最大线程数量。默认值为 4。
+        maxProcessCount 8
+        // 设置 DEX 编译器的最大堆大小。不过，您应当增加 Gradle 的堆大小（启用 dex-in-process 时，将与 DEX 编译器共享），而不是设置此属性。
+        // javaMaxHeapSize "2048m"
+        // Instead of setting the heap size for the DEX process, increase Gradle's
+        // heap size to enable dex-in-process. To learm more, read the next section.
+        // javaMaxHeapSize "2048m"
+        javaMaxHeapSize "4g" //此处可根据电脑本身配置 数值越大 当然越快
+    }
+    aaptOptions {
+        // 停用 PNG 处理. 如果您无法（或者不想）将 PNG 图像转换成 WebP，仍可以通过在每次构建应用时停用自动图像压缩的方式加快构建速度。要停用此优化
+        cruncherEnabled false
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    aaptOptions {
+        cruncherEnabled = false
+        useNewCruncher = false
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+        warningsAsErrors false
+        disable "UnusedResources"
+        textOutput "stdout"
+        textReport true
+    }
+}
+// 忽略文档编译错误. 设置编码
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-
-    testCompile 'junit:junit:4.12'
-
-    compile 'com.journeyapps:zxing-android-embedded:3.5.0'
-    compile 'com.google.zxing:core:3.0.1'
-
-    compile 'org.bouncycastle:bcprov-jdk15on:1.57'
-    compile 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'
-    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.journeyapps:zxing-android-embedded:3.5.0'
+//    implementation 'com.google.zxing:core:3.0.1'
+    implementation 'com.google.zxing:core:3.3.0'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.57'
+    implementation 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
 }

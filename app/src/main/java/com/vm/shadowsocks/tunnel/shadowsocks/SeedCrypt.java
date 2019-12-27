@@ -50,15 +50,15 @@ public class SeedCrypt extends CryptBase {
 
     public final static String CIPHER_SEED_CFB = "seed-cfb";
 
+    public SeedCrypt(String name, String password) {
+        super(name, password);
+    }
+
     public static Map<String, String> getCiphers() {
         Map<String, String> ciphers = new HashMap<String, String>();
         ciphers.put(CIPHER_SEED_CFB, SeedCrypt.class.getName());
 
         return ciphers;
-    }
-
-    public SeedCrypt(String name, String password) {
-        super(name, password);
     }
 
     @Override

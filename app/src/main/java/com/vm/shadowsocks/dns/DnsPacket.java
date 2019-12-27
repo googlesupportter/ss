@@ -49,40 +49,6 @@ public class DnsPacket {
         return packet;
     }
 
-    public void ToBytes(ByteBuffer buffer) {
-        Header.QuestionCount = 0;
-        Header.ResourceCount = 0;
-        Header.AResourceCount = 0;
-        Header.EResourceCount = 0;
-
-        if (Questions != null)
-            Header.QuestionCount = (short) Questions.length;
-        if (Resources != null)
-            Header.ResourceCount = (short) Resources.length;
-        if (AResources != null)
-            Header.AResourceCount = (short) AResources.length;
-        if (EResources != null)
-            Header.EResourceCount = (short) EResources.length;
-
-        this.Header.ToBytes(buffer);
-
-        for (int i = 0; i < Header.QuestionCount; i++) {
-            this.Questions[i].ToBytes(buffer);
-        }
-
-        for (int i = 0; i < Header.ResourceCount; i++) {
-            this.Resources[i].ToBytes(buffer);
-        }
-
-        for (int i = 0; i < Header.AResourceCount; i++) {
-            this.AResources[i].ToBytes(buffer);
-        }
-
-        for (int i = 0; i < Header.EResourceCount; i++) {
-            this.EResources[i].ToBytes(buffer);
-        }
-    }
-
     public static String ReadDomain(ByteBuffer buffer, int dnsHeaderOffset) {
         StringBuilder sb = new StringBuilder();
         int len = 0;
@@ -126,6 +92,40 @@ public class DnsPacket {
             for (int i = 0; i < item.length(); i++) {
                 buffer.put((byte) item.codePointAt(i));
             }
+        }
+    }
+
+    public void ToBytes(ByteBuffer buffer) {
+        Header.QuestionCount = 0;
+        Header.ResourceCount = 0;
+        Header.AResourceCount = 0;
+        Header.EResourceCount = 0;
+
+        if (Questions != null)
+            Header.QuestionCount = (short) Questions.length;
+        if (Resources != null)
+            Header.ResourceCount = (short) Resources.length;
+        if (AResources != null)
+            Header.AResourceCount = (short) AResources.length;
+        if (EResources != null)
+            Header.EResourceCount = (short) EResources.length;
+
+        this.Header.ToBytes(buffer);
+
+        for (int i = 0; i < Header.QuestionCount; i++) {
+            this.Questions[i].ToBytes(buffer);
+        }
+
+        for (int i = 0; i < Header.ResourceCount; i++) {
+            this.Resources[i].ToBytes(buffer);
+        }
+
+        for (int i = 0; i < Header.AResourceCount; i++) {
+            this.AResources[i].ToBytes(buffer);
+        }
+
+        for (int i = 0; i < Header.EResourceCount; i++) {
+            this.EResources[i].ToBytes(buffer);
         }
     }
 }

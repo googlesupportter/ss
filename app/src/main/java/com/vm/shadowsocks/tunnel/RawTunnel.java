@@ -22,13 +22,13 @@ public class RawTunnel extends Tunnel {
     }
 
     @Override
-    protected void beforeSend(ByteBuffer buffer) throws Exception {
+    protected void beforeSend(ByteBuffer buffer) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    protected void afterReceived(ByteBuffer buffer) throws Exception {
+    protected void afterReceived(ByteBuffer buffer) {
         // TODO Auto-generated method stub
 
     }

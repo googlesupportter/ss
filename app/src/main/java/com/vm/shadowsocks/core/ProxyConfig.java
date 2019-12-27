@@ -30,19 +30,16 @@ import java.util.regex.Pattern;
 public class ProxyConfig {
     public static final ProxyConfig Instance = new ProxyConfig();
     public final static boolean IS_DEBUG = false;
-    public static String AppInstallID;
-    public static String AppVersion;
     public final static int FAKE_NETWORK_MASK = CommonMethods.ipStringToInt("255.255.0.0");
     public final static int FAKE_NETWORK_IP = CommonMethods.ipStringToInt("172.25.0.0");
-
+    public static String AppInstallID;
+    public static String AppVersion;
+    public ArrayList<Config> m_ProxyList;
+    public boolean globalMode = false;
     ArrayList<IPAddress> m_IpList;
     ArrayList<IPAddress> m_DnsList;
     ArrayList<IPAddress> m_RouteList;
-    public ArrayList<Config> m_ProxyList;
     HashMap<String, Boolean> m_DomainMap;
-
-    public boolean globalMode = false;
-
     int m_dns_ttl;
     String m_welcome_info;
     String m_session_name;
@@ -52,54 +49,6 @@ public class ProxyConfig {
     int m_mtu;
 
     Timer m_Timer;
-
-    public class IPAddress {
-        public final String Address;
-        public final int PrefixLength;
-
-        public IPAddress(String address, int prefixLength) {
-            this.Address = address;
-            this.PrefixLength = prefixLength;
-        }
-
-        public IPAddress(String ipAddresString) {
-            String[] arrStrings = ipAddresString.split("/");
-            String address = arrStrings[0];
-            int prefixLength = 32;
-            if (arrStrings.length > 1) {
-                prefixLength = Integer.parseInt(arrStrings[1]);
-            }
-            this.Address = address;
-            this.PrefixLength = prefixLength;
-        }
-
-        @SuppressLint("DefaultLocale")
-        @Override
-        public String toString() {
-            return String.format("%s/%d", Address, PrefixLength);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == null) {
-                return false;
-            } else {
-                return this.toString().equals(o.toString());
-            }
-        }
-    }
-
-    public ProxyConfig() {
-        m_IpList = new ArrayList<IPAddress>();
-        m_DnsList = new ArrayList<IPAddress>();
-        m_RouteList = new ArrayList<IPAddress>();
-        m_ProxyList = new ArrayList<Config>();
-        m_DomainMap = new HashMap<String, Boolean>();
-
-        m_Timer = new Timer();
-        m_Timer.schedule(m_Task, 120000, 120000);//每两分钟刷新一次。
-    }
-
     TimerTask m_Task = new TimerTask() {
         @Override
         public void run() {
@@ -125,6 +74,16 @@ public class ProxyConfig {
         }
     };
 
+    public ProxyConfig() {
+        m_IpList = new ArrayList<IPAddress>();
+        m_DnsList = new ArrayList<IPAddress>();
+        m_RouteList = new ArrayList<IPAddress>();
+        m_ProxyList = new ArrayList<Config>();
+        m_DomainMap = new HashMap<String, Boolean>();
+
+        m_Timer = new Timer();
+        m_Timer.schedule(m_Task, 120000, 120000);//每两分钟刷新一次。
+    }
 
     public static boolean isFakeIP(int ip) {
         return (ip & ProxyConfig.FAKE_NETWORK_MASK) == ProxyConfig.FAKE_NETWORK_IP;
@@ -406,13 +365,8 @@ public class ProxyConfig {
         if (valueString == null || valueString.isEmpty())
             return false;
         valueString = valueString.toLowerCase(Locale.ENGLISH).trim();
-        if (valueString.equals("on") || valueString.equals("1") || valueString.equals("true") || valueString.equals("yes")) {
-            return true;
-        } else {
-            return false;
-        }
+        return valueString.equals("on") || valueString.equals("1") || valueString.equals("true") || valueString.equals("yes");
     }
-
 
     private void addIPAddressToList(String[] items, int offset, ArrayList<IPAddress> list) {
         for (int i = offset; i < items.length; i++) {
@@ -424,6 +378,42 @@ public class ProxyConfig {
                 if (!list.contains(ip)) {
                     list.add(ip);
                 }
+            }
+        }
+    }
+
+    public class IPAddress {
+        public final String Address;
+        public final int PrefixLength;
+
+        public IPAddress(String address, int prefixLength) {
+            this.Address = address;
+            this.PrefixLength = prefixLength;
+        }
+
+        public IPAddress(String ipAddresString) {
+            String[] arrStrings = ipAddresString.split("/");
+            String address = arrStrings[0];
+            int prefixLength = 32;
+            if (arrStrings.length > 1) {
+                prefixLength = Integer.parseInt(arrStrings[1]);
+            }
+            this.Address = address;
+            this.PrefixLength = prefixLength;
+        }
+
+        @SuppressLint("DefaultLocale")
+        @Override
+        public String toString() {
+            return String.format("%s/%d", Address, PrefixLength);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null) {
+                return false;
+            } else {
+                return this.toString().equals(o.toString());
             }
         }
     }

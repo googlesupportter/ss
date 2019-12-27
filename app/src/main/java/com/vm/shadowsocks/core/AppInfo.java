@@ -14,20 +14,20 @@ public class AppInfo {
         return this.appIcon;
     }
 
-    public String getAppLabel() {
-        return this.appLabel;
-    }
-
-    public String getPkgName() {
-        return this.pkgName;
-    }
-
     public void setAppIcon(Drawable var1) {
         this.appIcon = var1;
     }
 
+    public String getAppLabel() {
+        return this.appLabel;
+    }
+
     public void setAppLabel(String var1) {
         this.appLabel = var1;
+    }
+
+    public String getPkgName() {
+        return this.pkgName;
     }
 
     public void setPkgName(String var1) {

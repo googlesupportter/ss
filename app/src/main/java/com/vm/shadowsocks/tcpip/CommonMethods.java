@@ -4,6 +4,13 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+/**
+ * @Copyright © 2018 sanbo Inc. All rights reserved.
+ * @Description: IP转换相关的
+ * @Version: 1.0
+ * @Create: 2018/08/03 12:14:54
+ * @Author: sanbo
+ */
 public class CommonMethods {
 
     public static InetAddress ipIntToInet4Address(int ip) {

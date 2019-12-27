@@ -11,16 +11,7 @@ public class Resource {
     public byte[] Data;
 
     private int offset;
-
-    public int Offset() {
-        return offset;
-    }
-
     private int length;
-
-    public int Length() {
-        return length;
-    }
 
     public static Resource FromBytes(ByteBuffer buffer) {
 
@@ -35,6 +26,14 @@ public class Resource {
         buffer.get(r.Data);
         r.length = buffer.arrayOffset() + buffer.position() - r.offset;
         return r;
+    }
+
+    public int Offset() {
+        return offset;
+    }
+
+    public int Length() {
+        return length;
     }
 
     public void ToBytes(ByteBuffer buffer) {

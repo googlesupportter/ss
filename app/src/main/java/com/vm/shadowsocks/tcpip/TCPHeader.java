@@ -1,6 +1,14 @@
 package com.vm.shadowsocks.tcpip;
 
+import java.util.Locale;
 
+/**
+ * @Copyright © 2018 sanbo Inc. All rights reserved.
+ * @Description: TCP头
+ * @Version: 1.0
+ * @Create: 2018/08/03 12:25:10
+ * @Author: sanbo
+ */
 public class TCPHeader {
 
     public static final int FIN = 1;
@@ -71,8 +79,7 @@ public class TCPHeader {
 
     @Override
     public String toString() {
-        // TODO Auto-generated method stub
-        return String.format("%s%s%s%s%s%s%d->%d %s:%s",
+        return String.format(Locale.getDefault(), "%s%s%s%s%s%s%d->%d %s:%s",
                 (getFlags() & SYN) == SYN ? "SYN " : "",
                 (getFlags() & ACK) == ACK ? "ACK " : "",
                 (getFlags() & PSH) == PSH ? "PSH " : "",

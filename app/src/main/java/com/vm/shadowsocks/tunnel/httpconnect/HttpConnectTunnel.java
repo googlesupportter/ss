@@ -6,6 +6,7 @@ import com.vm.shadowsocks.tunnel.Tunnel;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Selector;
+import java.util.Locale;
 
 public class HttpConnectTunnel extends Tunnel {
 
@@ -19,7 +20,7 @@ public class HttpConnectTunnel extends Tunnel {
 
     @Override
     protected void onConnected(ByteBuffer buffer) throws Exception {
-        String request = String.format("CONNECT %s:%d HTTP/1.0\r\nProxy-Connection: keep-alive\r\nUser-Agent: %s\r\nX-App-Install-ID: %s\r\n\r\n",
+        String request = String.format(Locale.getDefault(), "CONNECT %s:%d HTTP/1.0\r\nProxy-Connection: keep-alive\r\nUser-Agent: %s\r\nX-App-Install-ID: %s\r\n\r\n",
                 m_DestAddress.getHostName(),
                 m_DestAddress.getPort(),
                 ProxyConfig.Instance.getUserAgent(),

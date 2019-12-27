@@ -12,7 +12,7 @@ public class NatSessionManager {
 
     public static NatSession getSession(int portKey) {
         NatSession session = Sessions.get(portKey);
-        if (session!=null) {
+        if (session != null) {
             session.LastNanoTime = System.nanoTime();
         }
         return Sessions.get(portKey);

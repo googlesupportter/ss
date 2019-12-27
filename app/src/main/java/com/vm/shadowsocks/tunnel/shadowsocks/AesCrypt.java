@@ -56,6 +56,10 @@ public class AesCrypt extends CryptBase {
     public final static String CIPHER_AES_192_OFB = "aes-192-ofb";
     public final static String CIPHER_AES_256_OFB = "aes-256-ofb";
 
+    public AesCrypt(String name, String password) {
+        super(name, password);
+    }
+
     public static Map<String, String> getCiphers() {
         Map<String, String> ciphers = new HashMap<String, String>();
         ciphers.put(CIPHER_AES_128_CFB, AesCrypt.class.getName());
@@ -66,10 +70,6 @@ public class AesCrypt extends CryptBase {
         ciphers.put(CIPHER_AES_256_OFB, AesCrypt.class.getName());
 
         return ciphers;
-    }
-
-    public AesCrypt(String name, String password) {
-        super(name, password);
     }
 
     @Override

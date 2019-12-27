@@ -52,6 +52,10 @@ public class CamelliaCrypt extends CryptBase {
     public final static String CIPHER_CAMELLIA_192_CFB = "camellia-192-cfb";
     public final static String CIPHER_CAMELLIA_256_CFB = "camellia-256-cfb";
 
+    public CamelliaCrypt(String name, String password) {
+        super(name, password);
+    }
+
     public static Map<String, String> getCiphers() {
         Map<String, String> ciphers = new HashMap<String, String>();
         ciphers.put(CIPHER_CAMELLIA_128_CFB, CamelliaCrypt.class.getName());
@@ -59,10 +63,6 @@ public class CamelliaCrypt extends CryptBase {
         ciphers.put(CIPHER_CAMELLIA_256_CFB, CamelliaCrypt.class.getName());
 
         return ciphers;
-    }
-
-    public CamelliaCrypt(String name, String password) {
-        super(name, password);
     }
 
     @Override

@@ -52,6 +52,37 @@ import javax.crypto.SecretKey;
  */
 public abstract class CryptBase implements ICrypt {
 
+    protected final String _name;
+    protected final SecretKey _key;
+    protected final ShadowSocksKey _ssKey;
+    protected final int _ivLength;
+    protected final int _keyLength;
+    protected final Lock encLock = new ReentrantLock();
+    protected final Lock decLock = new ReentrantLock();
+    protected boolean _encryptIVSet;
+    protected boolean _decryptIVSet;
+    protected byte[] _encryptIV;
+    protected byte[] _decryptIV;
+    protected StreamCipher encCipher;
+    protected StreamCipher decCipher;
+    private Logger logger = Logger.getLogger(CryptBase.class.getName());
+    public CryptBase(String name, String password) {
+        _name = name.toLowerCase();
+        _ivLength = getIVLength();
+        _keyLength = getKeyLength();
+        _ssKey = new ShadowSocksKey(password, _keyLength);
+        _key = getKey();
+    }
+
+    public static byte[] md5Digest(byte[] input) {
+        try {
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            return md5.digest(input);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     protected abstract StreamCipher getCipher(boolean isEncrypted) throws InvalidAlgorithmParameterException;
 
     protected abstract SecretKey getKey();
@@ -60,33 +91,10 @@ public abstract class CryptBase implements ICrypt {
 
     protected abstract void _decrypt(byte[] data, ByteArrayOutputStream stream);
 
-    protected CipherParameters getCipherParameters(byte[] iv){
+    protected CipherParameters getCipherParameters(byte[] iv) {
         _decryptIV = new byte[_ivLength];
         System.arraycopy(iv, 0, _decryptIV, 0, _ivLength);
         return new ParametersWithIV(new KeyParameter(_key.getEncoded()), _decryptIV);
-    }
-
-    protected final String _name;
-    protected final SecretKey _key;
-    protected final ShadowSocksKey _ssKey;
-    protected final int _ivLength;
-    protected final int _keyLength;
-    protected boolean _encryptIVSet;
-    protected boolean _decryptIVSet;
-    protected byte[] _encryptIV;
-    protected byte[] _decryptIV;
-    protected final Lock encLock = new ReentrantLock();
-    protected final Lock decLock = new ReentrantLock();
-    protected StreamCipher encCipher;
-    protected StreamCipher decCipher;
-    private Logger logger = Logger.getLogger(CryptBase.class.getName());
-
-    public CryptBase(String name, String password) {
-        _name = name.toLowerCase();
-        _ivLength = getIVLength();
-        _keyLength = getKeyLength();
-        _ssKey = new ShadowSocksKey(password, _keyLength);
-        _key = getKey();
     }
 
     protected void setIV(byte[] iv, boolean isEncrypt) {
@@ -181,15 +189,5 @@ public abstract class CryptBase implements ICrypt {
         byte[] d = new byte[length];
         System.arraycopy(data, 0, d, 0, length);
         decrypt(d, stream);
-    }
-
-
-    public static byte[] md5Digest(byte[] input) {
-        try {
-            MessageDigest md5 = MessageDigest.getInstance("MD5");
-            return md5.digest(input);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }

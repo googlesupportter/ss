@@ -42,8 +42,8 @@ import javax.crypto.SecretKey;
  */
 public class ShadowSocksKey implements SecretKey {
 
-    private Logger logger = Logger.getLogger(ShadowSocksKey.class.getName());
     private final static int KEY_LENGTH = 32;
+    private Logger logger = Logger.getLogger(ShadowSocksKey.class.getName());
     private byte[] _key;
     private int _length;
 

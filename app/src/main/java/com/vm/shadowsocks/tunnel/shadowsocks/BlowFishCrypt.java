@@ -50,15 +50,15 @@ public class BlowFishCrypt extends CryptBase {
 
     public final static String CIPHER_BLOWFISH_CFB = "bf-cfb";
 
+    public BlowFishCrypt(String name, String password) {
+        super(name, password);
+    }
+
     public static Map<String, String> getCiphers() {
         Map<String, String> ciphers = new HashMap<String, String>();
         ciphers.put(CIPHER_BLOWFISH_CFB, BlowFishCrypt.class.getName());
 
         return ciphers;
-    }
-
-    public BlowFishCrypt(String name, String password) {
-        super(name, password);
     }
 
     @Override

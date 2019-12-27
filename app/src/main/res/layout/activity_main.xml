@@ -8,11 +8,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:tag="ProxyUrl"
-        android:padding="13dp">
+        android:padding="13dp"
+        android:tag="ProxyUrl">
 
         <TextView
-            android:id="@+id/textViewProxyUrlTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/config_url"
@@ -28,23 +27,23 @@
     </LinearLayout>
 
     <View
+        android:id="@+id/line"
         android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:background="@android:color/darker_gray"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:alpha="0.4" />
+        android:alpha="0.4"
+        android:background="@android:color/darker_gray" />
 
     <LinearLayout
         android:id="@+id/AppSelectLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:tag="AppSelect"
-        android:padding="13dp">
+        android:padding="13dp"
+        android:tag="AppSelect">
 
         <TextView
-            android:id="@+id/textViewAppSelectTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/select_app"
@@ -63,10 +62,10 @@
         android:id="@+id/textViewAppSelectLine"
         android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:background="@android:color/darker_gray"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:alpha="0.4" />
+        android:alpha="0.4"
+        android:background="@android:color/darker_gray" />
 
     <ScrollView
         android:id="@+id/scrollViewLog"
@@ -88,19 +87,19 @@
         </LinearLayout>
     </ScrollView>
 
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
+    <!--<TableRow-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"></TableRow>-->
 
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></TableRow>
+    <!--<TableRow-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"></TableRow>-->
 
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <!--<TableRow-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
 
-        <FrameLayout android:layout_column="14"></FrameLayout>
-    </TableRow>
+    <!--<FrameLayout android:layout_column="14"></FrameLayout>-->
+    <!--</TableRow>-->
 
 </TableLayout>

@@ -1,5 +1,8 @@
 package com.vm.shadowsocks.ui;
 
+import java.util.Collections;
+import java.util.List;
+
 import android.animation.Animator;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -25,22 +28,19 @@ import com.vm.shadowsocks.R;
 import com.vm.shadowsocks.core.AppInfo;
 import com.vm.shadowsocks.core.AppProxyManager;
 
-import java.util.Collections;
-import java.util.List;
-
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
  * Created by so898 on 2017/5/3.
  */
 
-public class AppManager extends Activity{
+public class AppManager extends Activity {
     private View loadingView;
     private RecyclerView appListView;
     private FastScroller fastScroller;
@@ -52,18 +52,19 @@ public class AppManager extends Activity{
         this.setContentView(R.layout.layout_apps);
 
         ActionBar actionBar = getActionBar();
-        if (actionBar != null)
+        if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         loadingView = findViewById(R.id.loading);
-        appListView = (RecyclerView)findViewById(R.id.list);
+        appListView = findViewById(R.id.list);
         appListView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         appListView.setItemAnimator(new DefaultItemAnimator());
-        fastScroller = (FastScroller)findViewById(R.id.fastscroller);
+        fastScroller = findViewById(R.id.fastscroller);
 
         Observable<List<AppInfo>> observable = Observable.create(new ObservableOnSubscribe<List<AppInfo>>() {
             @Override
-            public void subscribe(ObservableEmitter<List<AppInfo>> appInfo) throws Exception {
+            public void subscribe(ObservableEmitter<List<AppInfo>> appInfo) {
                 queryAppInfo();
                 adapter = new AppManagerAdapter();
                 appInfo.onComplete();
@@ -71,13 +72,16 @@ public class AppManager extends Activity{
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
         Observer<List<AppInfo>> observer = new Observer<List<AppInfo>>() {
             @Override
-            public void onSubscribe(Disposable d) {}
+            public void onSubscribe(Disposable d) {
+            }
 
             @Override
-            public void onNext(List<AppInfo> aLong) {}
+            public void onNext(List<AppInfo> aLong) {
+            }
 
             @Override
-            public void onError(Throwable e) {}
+            public void onError(Throwable e) {
+            }
 
             @Override
             public void onComplete() {
@@ -89,7 +93,8 @@ public class AppManager extends Activity{
                 appListView.animate().alpha(1).setDuration(shortAnimTime);
                 loadingView.animate().alpha(0).setDuration(shortAnimTime).setListener(new Animator.AnimatorListener() {
                     @Override
-                    public void onAnimationStart(Animator animator) {}
+                    public void onAnimationStart(Animator animator) {
+                    }
 
                     @Override
                     public void onAnimationEnd(Animator animator) {
@@ -97,10 +102,12 @@ public class AppManager extends Activity{
                     }
 
                     @Override
-                    public void onAnimationCancel(Animator animator) {}
+                    public void onAnimationCancel(Animator animator) {
+                    }
 
                     @Override
-                    public void onAnimationRepeat(Animator animator) {}
+                    public void onAnimationRepeat(Animator animator) {
+                    }
                 });
             }
         };
@@ -124,7 +131,9 @@ public class AppManager extends Activity{
                 appInfo.setPkgName(pkgName);
                 appInfo.setAppIcon(icon);
                 if (!appInfo.getPkgName().equals("com.vm.shadowsocks"))//App本身会强制加入代理列表
+                {
                     AppProxyManager.Instance.mlistAppInfo.add(appInfo);
+                }
             }
         }
     }
@@ -143,8 +152,8 @@ public class AppManager extends Activity{
 }
 
 class AppViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-    private ImageView icon = (ImageView)itemView.findViewById(R.id.itemicon);
-    private Switch check = (Switch)itemView.findViewById(R.id.itemcheck);
+    private ImageView icon = (ImageView) itemView.findViewById(R.id.itemicon);
+    private Switch check = (Switch) itemView.findViewById(R.id.itemcheck);
     private AppInfo item;
     private Boolean proxied = false;
 
@@ -176,10 +185,10 @@ class AppViewHolder extends RecyclerView.ViewHolder implements View.OnClickListe
 
 class AppManagerAdapter extends RecyclerView.Adapter<AppViewHolder> implements SectionTitleProvider {
 
-
     @Override
     public AppViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new AppViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_apps_item, parent, false));
+        return new AppViewHolder(
+                LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_apps_item, parent, false));
     }
 
     @Override

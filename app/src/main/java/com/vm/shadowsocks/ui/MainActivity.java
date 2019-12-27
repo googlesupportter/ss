@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,7 +25,6 @@ import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -33,22 +33,21 @@ import com.vm.shadowsocks.core.AppInfo;
 import com.vm.shadowsocks.core.AppProxyManager;
 import com.vm.shadowsocks.core.LocalVpnService;
 import com.vm.shadowsocks.core.ProxyConfig;
+import com.vm.shadowsocks.utils.L;
+import com.vm.shadowsocks.utils.ToastUtils;
 
 import java.util.Calendar;
+
 
 public class MainActivity extends Activity implements
         View.OnClickListener,
         OnCheckedChangeListener,
         LocalVpnService.onStatusChangedListener {
 
-    private static String GL_HISTORY_LOGS;
-
     private static final String TAG = MainActivity.class.getSimpleName();
-
     private static final String CONFIG_URL_KEY = "CONFIG_URL_KEY";
-
     private static final int START_VPN_SERVICE_REQUEST_CODE = 1985;
-
+    private static String GL_HISTORY_LOGS;
     private Switch switchProxy;
     private TextView textViewLog;
     private ScrollView scrollViewLog;
@@ -60,12 +59,12 @@ public class MainActivity extends Activity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        scrollViewLog = (ScrollView) findViewById(R.id.scrollViewLog);
-        textViewLog = (TextView) findViewById(R.id.textViewLog);
+        scrollViewLog = findViewById(R.id.scrollViewLog);
+        textViewLog = findViewById(R.id.textViewLog);
         findViewById(R.id.ProxyUrlLayout).setOnClickListener(this);
         findViewById(R.id.AppSelectLayout).setOnClickListener(this);
 
-        textViewProxyUrl = (TextView) findViewById(R.id.textViewProxyUrl);
+        textViewProxyUrl = findViewById(R.id.textViewProxyUrl);
         String ProxyUrl = readProxyUrl();
         if (TextUtils.isEmpty(ProxyUrl)) {
             textViewProxyUrl.setText(R.string.config_not_set_value);
@@ -80,12 +79,13 @@ public class MainActivity extends Activity implements
         LocalVpnService.addOnStatusChangedListener(this);
 
         //Pre-App Proxy
-        if (AppProxyManager.isLollipopOrAbove){
+        if (AppProxyManager.isLollipopOrAbove) {
             new AppProxyManager(this);
-            textViewProxyApp = (TextView) findViewById(R.id.textViewAppSelectDetail);
+            textViewProxyApp = findViewById(R.id.textViewAppSelectDetail);
         } else {
             ((ViewGroup) findViewById(R.id.AppSelectLayout).getParent()).removeView(findViewById(R.id.AppSelectLayout));
-            ((ViewGroup) findViewById(R.id.textViewAppSelectLine).getParent()).removeView(findViewById(R.id.textViewAppSelectLine));
+            ((ViewGroup) findViewById(R.id.textViewAppSelectLine).getParent()).removeView(
+                    findViewById(R.id.textViewAppSelectLine));
         }
     }
 
@@ -118,19 +118,19 @@ public class MainActivity extends Activity implements
 
     boolean isValidUrl(String url) {
         try {
-            if (url == null || url.isEmpty())
+            if (url == null || url.isEmpty()) {
                 return false;
+            }
 
             if (url.startsWith("ss://")) {//file path
                 return true;
             } else { //url
                 Uri uri = Uri.parse(url);
-                if (!"http".equals(uri.getScheme()) && !"https".equals(uri.getScheme()))
+                if (!"http".equals(uri.getScheme()) && !"https".equals(uri.getScheme())) {
                     return false;
-                if (uri.getHost() == null)
-                    return false;
+                }
+                return uri.getHost() != null;
             }
-            return true;
         } catch (Exception e) {
             return false;
         }
@@ -142,7 +142,7 @@ public class MainActivity extends Activity implements
             return;
         }
 
-        if (v.getTag().toString().equals("ProxyUrl")){
+        if (v.getTag().toString().equals("ProxyUrl")) {
             new AlertDialog.Builder(this)
                     .setTitle(R.string.config_url)
                     .setItems(new CharSequence[]{
@@ -153,16 +153,18 @@ public class MainActivity extends Activity implements
                         public void onClick(DialogInterface dialogInterface, int i) {
                             switch (i) {
                                 case 0:
+                                    L.i("扫描二维码");
                                     scanForProxyUrl();
                                     break;
                                 case 1:
+                                    L.i("手动输入ss地址");
                                     showProxyUrlInputDialog();
                                     break;
                             }
                         }
                     })
                     .show();
-        } else if (v.getTag().toString().equals("AppSelect")){
+        } else if (v.getTag().toString().equals("AppSelect")) {
             System.out.println("abc");
             startActivity(new Intent(this, AppManager.class));
         }
@@ -170,13 +172,21 @@ public class MainActivity extends Activity implements
 
     private void scanForProxyUrl() {
         new IntentIntegrator(this)
+                //底部的提示文字，设为""可以置空
                 .setPrompt(getString(R.string.config_url_scan_hint))
+                //前置或者后置摄像头
+                //integrator.setCameraId(0)
+                //扫描成功的「哔哔」声，默认开启
+                .setBeepEnabled(false)
+                //设置竖屏页面
+                .setCaptureActivity(ScanActivity.class)
                 .initiateScan(IntentIntegrator.QR_CODE_TYPES);
     }
 
     private void showProxyUrlInputDialog() {
         final EditText editText = new EditText(this);
         editText.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
+        //ss://method:password@host:port
         editText.setHint(getString(R.string.config_url_hint));
         editText.setText(readProxyUrl());
 
@@ -195,7 +205,7 @@ public class MainActivity extends Activity implements
                             setProxyUrl(ProxyUrl);
                             textViewProxyUrl.setText(ProxyUrl);
                         } else {
-                            Toast.makeText(MainActivity.this, R.string.err_invalid_url, Toast.LENGTH_SHORT).show();
+                            ToastUtils.show(R.string.err_invalid_url);
                         }
                     }
                 })
@@ -228,7 +238,7 @@ public class MainActivity extends Activity implements
         switchProxy.setEnabled(true);
         switchProxy.setChecked(isRunning);
         onLogReceived(status);
-        Toast.makeText(this, status, Toast.LENGTH_SHORT).show();
+        ToastUtils.show(status);
     }
 
     @Override
@@ -251,7 +261,7 @@ public class MainActivity extends Activity implements
     private void startVPNService() {
         String ProxyUrl = readProxyUrl();
         if (!isValidUrl(ProxyUrl)) {
-            Toast.makeText(this, R.string.err_invalid_url, Toast.LENGTH_SHORT).show();
+            ToastUtils.show(R.string.err_invalid_url);
             switchProxy.post(new Runnable() {
                 @Override
                 public void run() {
@@ -264,6 +274,7 @@ public class MainActivity extends Activity implements
 
         textViewLog.setText("");
         GL_HISTORY_LOGS = null;
+        L.i("startVPNService will start...");
         onLogReceived("starting...");
         LocalVpnService.ProxyUrl = ProxyUrl;
         startService(new Intent(this, LocalVpnService.class));
@@ -282,14 +293,18 @@ public class MainActivity extends Activity implements
             return;
         }
 
+        /**
+         * 扫描结果处理
+         */
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
         if (scanResult != null) {
-            String ProxyUrl = scanResult.getContents();
-            if (isValidUrl(ProxyUrl)) {
-                setProxyUrl(ProxyUrl);
-                textViewProxyUrl.setText(ProxyUrl);
+            String proxyUrl = scanResult.getContents();
+            L.i("扫描到的结果:" + proxyUrl);
+            if (isValidUrl(proxyUrl)) {
+                setProxyUrl(proxyUrl);
+                textViewProxyUrl.setText(proxyUrl);
             } else {
-                Toast.makeText(MainActivity.this, R.string.err_invalid_url, Toast.LENGTH_SHORT).show();
+                ToastUtils.show(R.string.err_invalid_url);
             }
             return;
         }
@@ -321,6 +336,9 @@ public class MainActivity extends Activity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_about:
+                /*
+                 * 点击关于
+                 */
                 new AlertDialog.Builder(this)
                         .setTitle(getString(R.string.app_name) + getVersionName())
                         .setMessage(R.string.about_info)
@@ -328,13 +346,17 @@ public class MainActivity extends Activity implements
                         .setNegativeButton(R.string.btn_more, new OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/dawei101/shadowsocks-android-java")));
+                                startActivity(new Intent(Intent.ACTION_VIEW,
+                                        Uri.parse("https://github.com/dawei101/shadowsocks-android-java")));
                             }
                         })
                         .show();
 
                 return true;
             case R.id.menu_item_exit:
+                /*
+                 * 点击退出
+                 */
                 if (!LocalVpnService.IsRunning) {
                     finish();
                     return true;
@@ -358,6 +380,9 @@ public class MainActivity extends Activity implements
 
                 return true;
             case R.id.menu_item_toggle_global:
+                /*
+                 * 打开/关闭 全局模式。内存持有
+                 */
                 ProxyConfig.Instance.globalMode = !ProxyConfig.Instance.globalMode;
                 if (ProxyConfig.Instance.globalMode) {
                     onLogReceived("Proxy global mode is on");
@@ -381,6 +406,9 @@ public class MainActivity extends Activity implements
                 textViewProxyApp.setText(tmpString);
             }
         }
+
+//            String base = method:password@ip:port
+//            L.i(new String(Base64.encode(base.getBytes("ASCII"),Base64.DEFAULT)));
     }
 
     @Override

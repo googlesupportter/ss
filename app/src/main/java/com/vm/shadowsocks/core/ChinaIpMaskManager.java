@@ -31,6 +31,7 @@ public class ChinaIpMaskManager {
         int count = 0;
         try {
             byte[] buffer = new byte[4096];
+//            StringBuilder sb = new StringBuilder();
             while ((count = inputStream.read(buffer)) > 0) {
                 for (int i = 0; i < count; i += 8) {
                     int ip = CommonMethods.readInt(buffer, i);
@@ -38,8 +39,10 @@ public class ChinaIpMaskManager {
                     ChinaIpMaskDict.put(ip, mask);
                     MaskDict.put(mask, mask);
                     //System.out.printf("%s/%s\n", CommonMethods.IP2String(ip),CommonMethods.IP2String(mask));
+//                    sb.append(CommonMethods.ipIntToString(ip)).append("/").append(CommonMethods.ipIntToString(mask)).append("\n");
                 }
             }
+//            L.i(sb);
             inputStream.close();
             System.out.printf("ChinaIpMask records count: %d\n", ChinaIpMaskDict.size());
         } catch (IOException e) {

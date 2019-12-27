@@ -1,5 +1,6 @@
 # shadowsocks-android-java
 
+
 Last release: [Download](https://github.com/dawei101/shadowsocks-android-java/releases)
 
 
@@ -102,5 +103,16 @@ Brother version
 
 [Apache License](./LICENSE)
 
+
+
+
+### 变更日志 
+
+
+#### 初始化版本
+-----
+
+更改日期: 2018.10.29。
+更改内容: 初始化版本。
 
 

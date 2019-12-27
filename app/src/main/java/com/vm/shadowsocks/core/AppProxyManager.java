@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 
+import com.vm.shadowsocks.utils.L;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -14,24 +16,23 @@ import java.util.List;
 import static android.content.Context.MODE_PRIVATE;
 
 public class AppProxyManager {
-    public static boolean isLollipopOrAbove = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
-
-    public static AppProxyManager Instance;
     private static final String PROXY_APPS = "PROXY_APPS";
-    private Context mContext;
-
+    // 5.0以上版本(21)
+    public static boolean isLollipopOrAbove = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+    public static AppProxyManager Instance;
     public List<AppInfo> mlistAppInfo = new ArrayList<AppInfo>();
     public List<AppInfo> proxyAppInfo = new ArrayList<AppInfo>();
+    private Context mContext;
 
-    public AppProxyManager(Context context){
+    public AppProxyManager(Context context) {
         this.mContext = context;
         Instance = this;
         readProxyAppsList();
     }
 
-    public void removeProxyApp(String pkg){
+    public void removeProxyApp(String pkg) {
         for (AppInfo app : this.proxyAppInfo) {
-            if (app.getPkgName().equals(pkg)){
+            if (app.getPkgName().equals(pkg)) {
                 proxyAppInfo.remove(app);
                 break;
             }
@@ -39,9 +40,9 @@ public class AppProxyManager {
         writeProxyAppsList();
     }
 
-    public void addProxyApp(String pkg){
+    public void addProxyApp(String pkg) {
         for (AppInfo app : this.mlistAppInfo) {
-            if (app.getPkgName().equals(pkg)){
+            if (app.getPkgName().equals(pkg)) {
                 proxyAppInfo.add(app);
                 break;
             }
@@ -49,9 +50,9 @@ public class AppProxyManager {
         writeProxyAppsList();
     }
 
-    public boolean isAppProxy(String pkg){
+    public boolean isAppProxy(String pkg) {
         for (AppInfo app : this.proxyAppInfo) {
-            if (app.getPkgName().equals(pkg)){
+            if (app.getPkgName().equals(pkg)) {
                 return true;
             }
         }
@@ -62,21 +63,22 @@ public class AppProxyManager {
         SharedPreferences preferences = mContext.getSharedPreferences("shadowsocksProxyUrl", MODE_PRIVATE);
         String tmpString = preferences.getString(PROXY_APPS, "");
         try {
-            if (proxyAppInfo != null){
+            L.i("readProxyAppsList  tmpString:" + tmpString);
+            if (proxyAppInfo != null) {
                 proxyAppInfo.clear();
             }
-            if (tmpString.isEmpty()){
+            if (tmpString.isEmpty()) {
                 return;
             }
             JSONArray jsonArray = new JSONArray(tmpString);
-            for (int i = 0; i < jsonArray.length() ; i++){
+            for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject object = jsonArray.getJSONObject(i);
                 AppInfo appInfo = new AppInfo();
                 appInfo.setAppLabel(object.getString("label"));
                 appInfo.setPkgName(object.getString("pkg"));
                 proxyAppInfo.add(appInfo);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -85,7 +87,7 @@ public class AppProxyManager {
         SharedPreferences preferences = mContext.getSharedPreferences("shadowsocksProxyUrl", MODE_PRIVATE);
         try {
             JSONArray jsonArray = new JSONArray();
-            for (int i = 0; i < proxyAppInfo.size() ; i++){
+            for (int i = 0; i < proxyAppInfo.size(); i++) {
                 JSONObject object = new JSONObject();
                 AppInfo appInfo = proxyAppInfo.get(i);
                 object.put("label", appInfo.getAppLabel());
@@ -95,7 +97,7 @@ public class AppProxyManager {
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString(PROXY_APPS, jsonArray.toString());
             editor.apply();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

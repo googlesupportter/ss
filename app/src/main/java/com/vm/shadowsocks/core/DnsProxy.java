@@ -20,24 +20,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DnsProxy implements Runnable {
 
-    private class QueryState {
-        public short ClientQueryID;
-        public long QueryNanoTime;
-        public int ClientIP;
-        public short ClientPort;
-        public int RemoteIP;
-        public short RemotePort;
-    }
-
-    public boolean Stopped;
     private static final ConcurrentHashMap<Integer, String> IPDomainMaps = new ConcurrentHashMap<Integer, String>();
     private static final ConcurrentHashMap<String, Integer> DomainIPMaps = new ConcurrentHashMap<String, Integer>();
     private final long QUERY_TIMEOUT_NS = 10 * 1000000000L;
+    public boolean Stopped;
     private DatagramSocket m_Client;
     private Thread m_ReceivedThread;
     private short m_QueryID;
     private SparseArray<QueryState> m_QueryArray;
-
     public DnsProxy() throws IOException {
         m_QueryArray = new SparseArray<QueryState>();
         m_Client = new DatagramSocket(0);
@@ -267,5 +257,14 @@ public class DnsProxy implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+
+    private class QueryState {
+        public short ClientQueryID;
+        public long QueryNanoTime;
+        public int ClientIP;
+        public short ClientPort;
+        public int RemoteIP;
+        public short RemotePort;
     }
 }

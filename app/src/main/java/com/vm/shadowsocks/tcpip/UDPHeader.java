@@ -1,5 +1,14 @@
 package com.vm.shadowsocks.tcpip;
 
+import java.util.Locale;
+
+/**
+ * @Copyright © 2018 sanbo Inc. All rights reserved.
+ * @Description: UDP头
+ * @Version: 1.0
+ * @Create: 2018/08/03 12:25:10
+ * @Author: sanbo
+ */
 public class UDPHeader {
     static final short offset_src_port = 0; // Source port
     static final short offset_dest_port = 2; // Destination port
@@ -48,8 +57,7 @@ public class UDPHeader {
 
     @Override
     public String toString() {
-        // TODO Auto-generated method stub
-        return String.format("%d->%d", getSourcePort() & 0xFFFF,
+        return String.format(Locale.getDefault(), "%d->%d", getSourcePort() & 0xFFFF,
                 getDestinationPort() & 0xFFFF);
     }
 }

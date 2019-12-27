@@ -17,18 +17,18 @@ import javax.crypto.spec.SecretKeySpec;
 public class Rc4Md5Crypt extends CryptBase {
     public static String CIPHER_RC4_MD5 = "rc4-md5";
 
+    public Rc4Md5Crypt(String name, String password) {
+        super(name, password);
+    }
+
     public static Map<String, String> getCiphers() {
         Map<String, String> ciphers = new HashMap<String, String>();
         ciphers.put(CIPHER_RC4_MD5, Rc4Md5Crypt.class.getName());
         return ciphers;
     }
 
-    public Rc4Md5Crypt(String name, String password) {
-        super(name, password);
-    }
-
     @Override
-    protected StreamCipher getCipher(boolean isEncrypted) throws InvalidAlgorithmParameterException {
+    protected StreamCipher getCipher(boolean isEncrypted) {
         return new RC4Engine();
     }
 

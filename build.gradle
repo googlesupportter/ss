@@ -2,22 +2,45 @@
 
 buildscript {
     repositories {
+        google()
         jcenter()
+        mavenLocal()
+        mavenCentral()
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        jcenter { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.0.1'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
-
 allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }
     repositories {
+        google()
         jcenter()
+        mavenLocal()
+        mavenCentral()
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        jcenter { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+
+        //Maven URL地址
+        maven {
+            url "http://mvn.gt.igexin.com/nexus/content/repositories/releases/"
+        }
     }
 }
 
 task clean(type: Delete) {
+    println rootProject.buildDir
     delete rootProject.buildDir
+    delete "app/build/"
 }

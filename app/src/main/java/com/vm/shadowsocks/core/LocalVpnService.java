@@ -10,6 +10,7 @@ import android.net.VpnService;
 import android.os.Build;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
+import android.text.TextUtils;
 
 import com.vm.shadowsocks.R;
 import com.vm.shadowsocks.core.ProxyConfig.IPAddress;
@@ -19,6 +20,7 @@ import com.vm.shadowsocks.tcpip.IPHeader;
 import com.vm.shadowsocks.tcpip.TCPHeader;
 import com.vm.shadowsocks.tcpip.UDPHeader;
 import com.vm.shadowsocks.ui.MainActivity;
+import com.vm.shadowsocks.utils.L;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -66,27 +68,7 @@ public class LocalVpnService extends VpnService implements Runnable {
         Instance = this;
 
         System.out.printf("New VPNService(%d)\n", ID);
-    }
-
-    @Override
-    public void onCreate() {
-        System.out.printf("VPNService(%s) created.\n", ID);
-        // Start a new session by creating a new thread.
-        m_VPNThread = new Thread(this, "VPNServiceThread");
-        m_VPNThread.start();
-        super.onCreate();
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        IsRunning = true;
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    public interface onStatusChangedListener {
-        public void onStatusChanged(String status, Boolean isRunning);
-
-        public void onLogReceived(String logString);
+        L.i("LocalVpnService() New VPNService(%d)\n", ID);
     }
 
     public static void addOnStatusChangedListener(onStatusChangedListener listener) {
@@ -99,6 +81,22 @@ public class LocalVpnService extends VpnService implements Runnable {
         if (m_OnStatusChangedListeners.containsKey(listener)) {
             m_OnStatusChangedListeners.remove(listener);
         }
+    }
+
+    @Override
+    public void onCreate() {
+        System.out.printf("VPNService(%s) created.\n", ID);
+        L.i("LocalVpnService.onCreate().  VPNService(%s) created.\n", ID);
+        // Start a new session by creating a new thread.
+        m_VPNThread = new Thread(this, "VPNServiceThread");
+        m_VPNThread.start();
+        super.onCreate();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        IsRunning = true;
+        return super.onStartCommand(intent, flags, startId);
     }
 
     private void onStatusChanged(final String status, final boolean isRunning) {
@@ -161,6 +159,7 @@ public class LocalVpnService extends VpnService implements Runnable {
     public synchronized void run() {
         try {
             System.out.printf("VPNService(%s) work thread is runing...\n", ID);
+            L.i("VPNService(%s) work thread is runing...\n", ID);
 
             ProxyConfig.AppInstallID = getAppInstallID();//获取安装ID
             ProxyConfig.AppVersion = getVersionName();//获取版本号
@@ -200,11 +199,11 @@ public class LocalVpnService extends VpnService implements Runnable {
                     try {
                         ProxyConfig.Instance.m_ProxyList.clear();
                         ProxyConfig.Instance.addProxyToList(ProxyUrl);
+                        L.i("proxyURL:" + ProxyUrl + "------DefaultProxy: " + ProxyConfig.Instance.getDefaultProxy());
                         writeLog("Proxy is: %s", ProxyConfig.Instance.getDefaultProxy());
                     } catch (Exception e) {
-                        ;
                         String errString = e.getMessage();
-                        if (errString == null || errString.isEmpty()) {
+                        if (TextUtils.isEmpty(errString)) {
                             errString = e.toString();
                         }
                         IsRunning = false;
@@ -212,8 +211,8 @@ public class LocalVpnService extends VpnService implements Runnable {
                         continue;
                     }
                     String welcomeInfoString = ProxyConfig.Instance.getWelcomeInfo();
-                    if (welcomeInfoString != null && !welcomeInfoString.isEmpty()) {
-                        writeLog("%s", ProxyConfig.Instance.getWelcomeInfo());
+                    if (!TextUtils.isEmpty(welcomeInfoString)) {
+                        writeLog("WelcomeInfo:%s", ProxyConfig.Instance.getWelcomeInfo());
                     }
                     writeLog("Global mode is " + (ProxyConfig.Instance.globalMode ? "on" : "off"));
 
@@ -373,13 +372,13 @@ public class LocalVpnService extends VpnService implements Runnable {
 
 
         Class<?> SystemProperties = Class.forName("android.os.SystemProperties");
-        Method method = SystemProperties.getMethod("get", new Class[]{String.class});
+        Method method = SystemProperties.getMethod("get", String.class);
         ArrayList<String> servers = new ArrayList<String>();
         for (String name : new String[]{"net.dns1", "net.dns2", "net.dns3", "net.dns4",}) {
             String value = (String) method.invoke(null, name);
             if (value != null && !"".equals(value) && !servers.contains(value)) {
                 servers.add(value);
-                if (value.replaceAll("\\d", "").length() == 3){//防止IPv6地址导致问题
+                if (value.replaceAll("\\d", "").length() == 3) {//防止IPv6地址导致问题
                     builder.addRoute(value, 32);
                 } else {
                     builder.addRoute(value, 128);
@@ -389,16 +388,16 @@ public class LocalVpnService extends VpnService implements Runnable {
             }
         }
 
-        if (AppProxyManager.isLollipopOrAbove){
-            if (AppProxyManager.Instance.proxyAppInfo.size() == 0){
+        if (AppProxyManager.isLollipopOrAbove) {
+            if (AppProxyManager.Instance.proxyAppInfo.size() == 0) {
                 writeLog("Proxy All Apps");
             }
-            for (AppInfo app : AppProxyManager.Instance.proxyAppInfo){
+            for (AppInfo app : AppProxyManager.Instance.proxyAppInfo) {
                 builder.addAllowedApplication("com.vm.shadowsocks");//需要把自己加入代理，不然会无法进行网络连接
-                try{
+                try {
                     builder.addAllowedApplication(app.getPkgName());
                     writeLog("Proxy App: " + app.getAppLabel());
-                } catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     writeLog("Proxy App Fail: " + app.getAppLabel());
                 }
@@ -459,6 +458,12 @@ public class LocalVpnService extends VpnService implements Runnable {
         if (m_VPNThread != null) {
             m_VPNThread.interrupt();
         }
+    }
+
+    public interface onStatusChangedListener {
+        void onStatusChanged(String status, Boolean isRunning);
+
+        void onLogReceived(String logString);
     }
 
 }
